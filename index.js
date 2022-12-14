@@ -1,44 +1,75 @@
 console.clear();
 
-import { createServer } from 'http';
-
+import express from 'express';
 
 //! Crear servidor
+const expressServer = express();
 
-const httpServer = createServer();
+const PORT = 3000;
+
+//? Mensaje al levantar el server
+expressServer.listen(3000, () => console.log('Servidor levantado en el puerto ' + PORT))
+
+//! Middlewares
+//? este middleware se ejecuta en todos los enpoints, parsea los json
+expressServer.use(express.json())
+expressServer.use(express.text())
 
 
-httpServer.on('request', (req, res)=> {
+//! Metodos que se van a ejecutar dependiendo el path y el tipo de request
 
-    //? POST para enviar NUEVA DATA
-    //? PUT para enviar data y REEMPLAZAR la que ya existe
-
-    //* Path o ruta
-    console.log({ ruta: req.url });
-
-    //* Headers, la key las parsea a lowercase SIEMPRE
-    console.log({  headers: req.headers })
-
-    //* Body
-    let data = '';
-    let chunkIndex = 0;
-
-    req.on('data', (chunk) => {
-        data += chunk;
-        chunkIndex++;
-        console.log(chunkIndex);
+expressServer.get('/cuenta/', (req, res) => {
+    res.status(400).json({
+        message: 'Debe pasar dos parametros separados por slash /'
     })
-
-    req.on('end', () => {
-        // console.log(data)
-    });
- 
-
-    res.end('Recibido colega');
 })
 
+expressServer.get('/cuenta/:id', (req, res) => {
+    res.status(400).json({
+        message: 'Le falta un slash / seguido del segundo parametro'
+    })
+})
 
+//? obtener param por ruta dinamica
+expressServer.get('/cuenta/:id/:name', (req, res) => {
+    res.status(200).json({
+        ID: req.params.id,
+        Name: req.params.name,
+    })
+})
 
-//* Escoger el puerto
-httpServer.listen(3000)
+//? Obtener search querys 
+expressServer.get('/search', (req, res) => {
+    res.status(200).json({
+        Parametros_de_busqueda: req.query
+    })
+})
+
+//? obtener headers por ruta dinamica (siempre la key viene en lowercase)
+expressServer.get('/headers', (req, res) => {
+    
+    const accept = req.get('accept')
+    const headersRest = req.headers
+    res.status(200).json({
+        accept,
+        resto_de_headers: headersRest,
+    })
+})
+
+//? Obtener body (ver arriba los middlewares)
+
+expressServer.post('/body', (req, res) => {
+    const body = req.body
+
+    console.log(body)
+
+    res.status(200).send({
+        body,
+    })
+})
+
+//? Hara match con todos los metodos
+// expressServer.all('/todos', (req, res) => {
+//     res.send('Esto afecta todos los metodos')
+// })
 
