@@ -1,7 +1,7 @@
-import express from 'express'
+import { Router } from 'express'
 import { DBUSERS } from '../db.js';
 
-export const accountRouter = express.Router();
+export const accountRouter = Router();
 
 //* Este middleware solo afectara estas rutas
 //! Se ejecuta ANTES que la peticion
