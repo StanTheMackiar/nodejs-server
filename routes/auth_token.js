@@ -1,8 +1,11 @@
 import { Router } from "express";
-import { matchEmailPassword } from "../utils/verification.js";
+
+import dotenv from 'dotenv';
 import { SignJWT, jwtVerify } from 'jose';
 import { DBUSERS } from "../db.js";
-import dotenv from 'dotenv';
+
+import { matchEmailPassword } from "../utils/verification.js";
+import { validateLoginDTO } from "../middlewares/validateLoginDto.js";
 
 
 dotenv.config();
@@ -11,7 +14,10 @@ dotenv.config();
 const SECRET = process.env.JWT_SECRET_KEY
 const authTokenRouter = Router();
 
-authTokenRouter.post('/login', async (req, res) => {
+//? Middlewares que van a actuar antes del endpoint
+
+authTokenRouter.post('/login', validateLoginDTO, async (req, res) => {
+     
     const { email, password } = req.body;
 
     if ( !email || !password ) return res.status(400).send({
